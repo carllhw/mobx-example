@@ -1,24 +1,40 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {action, observable} from "mobx";
+import {observer} from "mobx-react";
+import DevTools from "mobx-react-devtools";
+
+var appState = observable({
+  timer: 0
+});
+
+appState.resetTimer = action(function reset() {
+  appState.timer = 0;
+});
+
+setInterval(action(function tick() {
+  appState.timer += 1;
+}), 1000);
+
+@observer
+class TimerView extends React.Component {
+  render() {
+    return (
+      <button onClick={this.onReset.bind(this)}>
+        Seconds passed: {this.props.appState.timer}
+      </button>
+    );
+  }
+
+  onReset() {
+    this.props.appState.resetTimer();
+  }
+}
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <TimerView appState={appState}/>
+      <DevTools/>
     </div>
   );
 }
